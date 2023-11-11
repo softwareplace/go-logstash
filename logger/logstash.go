@@ -6,7 +6,7 @@ import (
 	"github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"go-logstash/env"
+	"github.com/softwareplace/go-logstash/env"
 	"net"
 	"os"
 	"time"

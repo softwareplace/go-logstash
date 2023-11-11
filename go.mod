@@ -1,4 +1,4 @@
-module go-logstash
+module github.com/softwareplace/go-logstash
 
 go 1.20
 
