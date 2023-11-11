@@ -83,6 +83,7 @@ func connectionCreate(log *logrus.Logger) net.Conn {
 			if err != nil {
 				log.Error(TimeInfoLogger(), "Failed to connect to logstash", err)
 			}
+			log.Warn(TimeInfoLogger(), "A new connection was created!")
 			return conn
 		} else {
 			log.Warn(TimeInfoLogger(), "Trying to create a logstash connection but LOGSTASH_URI was not found")
