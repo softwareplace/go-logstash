@@ -38,6 +38,7 @@ func Logger(loggerName string) *logrus.Entry {
 	currentFilePath = logFileName
 
 	logger = logrus.New()
+	logger.SetOutput(os.Stdout)
 
 	rotateLogs, _ := rotatelogs.New(
 		logFileName,
@@ -47,7 +48,7 @@ func Logger(loggerName string) *logrus.Entry {
 	)
 
 	// set the new rotateLogs hook to the logger
-	logger.Hooks.Add(lfshook.NewHook(
+	logger.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
 			logrus.InfoLevel:  rotateLogs,
 			logrus.FatalLevel: rotateLogs,
@@ -59,7 +60,7 @@ func Logger(loggerName string) *logrus.Entry {
 
 	if connection != nil {
 		hook := logrustash.New(connection, &logrus.JSONFormatter{})
-		logger.Hooks.Add(hook)
+		logger.AddHook(hook)
 	}
 
 	return logger.WithFields(logrus.Fields{
