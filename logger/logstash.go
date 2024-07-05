@@ -37,17 +37,28 @@ func Logger(loggerName string) *logrus.Entry {
 
 	currentFilePath = logFileName
 
+	// Ensure the new log directory exists
+	err := os.MkdirAll(newLogDir, os.ModePerm)
+	if err != nil {
+		fmt.Printf("Failed to create log directory: %s, error: %v\n", newLogDir, err)
+	}
+
 	logger = logrus.New()
 	logger.SetOutput(os.Stdout)
 
-	rotateLogs, _ := rotatelogs.New(
-		logFileName,
-		rotatelogs.WithLinkName(logPath),
+	rotateLogs, err := rotatelogs.New(
+		logFileName+".%Y%m%d%H%M",
+		rotatelogs.WithLinkName(logFileName), // Correctly link to the latest log file
 		rotatelogs.WithMaxAge(24*time.Hour),
 		rotatelogs.WithRotationTime(time.Hour),
 	)
 
-	// set the new rotateLogs hook to the logger
+	if err != nil {
+		fmt.Printf("Failed to initialize log rotation: %v\n", err)
+		return nil
+	}
+
+	// Set the new rotateLogs hook to the logger
 	logger.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
 			logrus.InfoLevel:  rotateLogs,
@@ -83,13 +94,13 @@ func connectionCreate(log *logrus.Logger) net.Conn {
 
 			if err != nil {
 				log.Error(TimeInfoLogger(), "Failed to connect to logstash", err)
+			} else {
+				log.Warn(TimeInfoLogger(), "A new connection was created!")
+				return conn
 			}
-			log.Warn(TimeInfoLogger(), "A new connection was created!")
-			return conn
 		} else {
 			log.Warn(TimeInfoLogger(), "Trying to create a logstash connection but LOGSTASH_URI was not found")
 		}
-
 	}
 	return nil
 }
